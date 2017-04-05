@@ -2,12 +2,16 @@ package it.polito.tdp.model;
 
 import java.util.*;
 
+import it.polito.tdp.anagrammi.DAO.AnagrammaDAO;
+
 public class Model {
 
 	String parolaIniziale;
 	List<Lettera> listaLettere;
+	List<String> anagrammil;
+	List<Anagramma> anagrammi;
 	
-	public List<String> calcolaAnagrammi(String text) {
+	public List<Anagramma> calcolaAnagrammi(String text) {
 		
 		parolaIniziale = text;
 		char[] lettere = text.toCharArray();
@@ -18,30 +22,33 @@ public class Model {
 			listaLettere.add(l);
 		}
 		
-		List<String> soluzione = this.risolvi();
+		List<Anagramma> soluzione = this.risolvi();
 		return soluzione;
 	}
 
 	
-	public List<String> risolvi(){
+	public List<Anagramma> risolvi(){
 		List<Lettera> caratteri = new ArrayList<Lettera>();
-		List<String> anagrammi = new ArrayList<String>();
-		aggiungi(caratteri, 0, anagrammi);
+		anagrammil = new ArrayList<String>();
+		anagrammi = new ArrayList<Anagramma>();
+		aggiungi(caratteri, 0, anagrammil);
 		return anagrammi;
 	}
 
 
-	private void aggiungi(List<Lettera> caratteri, int livello, List<String> anagrammi) {
+	private void aggiungi(List<Lettera> caratteri, int livello, List<String> anagrammil) {
+		AnagrammaDAO dao = new AnagrammaDAO();
 		if(caratteri.size()== parolaIniziale.length()){
-			if(!anagrammi.contains(calcolaParola(caratteri))){
-				anagrammi.add(calcolaParola(caratteri));
+			if(!anagrammil.contains(calcolaParola(caratteri))){
+				anagrammil.add(calcolaParola(caratteri));
+				anagrammi.add(new Anagramma(calcolaParola(caratteri),dao.isCorrect(calcolaParola(caratteri))));
 			}
 		}
 		
 		for(Lettera l : listaLettere){
-			if(caratteri.contains(l)){
+			if(!caratteri.contains(l)){
 				caratteri.add(l);
-				aggiungi(caratteri, livello+1, anagrammi);
+				aggiungi(caratteri, livello+1, anagrammil);
 				caratteri.remove(l);
 			}
 		}
